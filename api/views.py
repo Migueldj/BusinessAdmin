@@ -7,7 +7,7 @@ import json
 
 from .models import Product, ProductSale, Sale
 
-from .serializers import ProductSerializer, SaleSerializer
+from .serializers import ProductSerializer, CreateSaleSerializer
 
 
 """
@@ -58,13 +58,12 @@ SALES
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def createSale(request):
-    print("Entro a la petición")
     response_data = {}
-    # serializer = SaleSerializer(data=request.data)
-    
-    products = request.data['products'].strip('[]')
-    print(products)
+    serializer = CreateSaleSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
 
+    data = serializer.validated_data    
+    print(data)
     # sale = Sale.objects.create(
 
     # )

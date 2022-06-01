@@ -12,7 +12,7 @@ function App() {
       //   age: 22
       // }
       const data = new FormData()
-      data.append('products', JSON.stringify([{"name":"lol"}, {"name":"xd"}]))
+      data.append('products', JSON.stringify([{"name":"lol", "quantity":2}, {"name":"xd", "quantity":5}]))
       const response = await createSale(data)
     } catch (error) {
       console.log(error.response)
