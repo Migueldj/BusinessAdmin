@@ -5,7 +5,7 @@ from django.db.models import Q
 from rest_framework.permissions import AllowAny
 import json
 
-from .models import Product, ProductSale, Sale
+from .models import User, Product, ProductInventory, ProductSale, Sale
 
 from .serializers import ProductSerializer, CreateSaleSerializer
 
@@ -35,7 +35,8 @@ def getProducts(request):
 def createProduct(request):
 
     response_data = {}
-    serializer = ProductSerializer(data=request.data)
+    context = {"request": request}
+    serializer = ProductSerializer(data=request.data, context=context)
     serializer.is_valid(raise_exception=True)
     Product.objects.create(**serializer.validated_data)
 
@@ -45,9 +46,13 @@ def createProduct(request):
 def updateProduct(request):
 
     response_data = {}
-    serializer = ProductSerializer(data=request.data)
+
+    context = {"request": request}
+    serializer = ProductSerializer(data=request.data, context=context)
     serializer.is_valid(raise_exception=True)
-    Product.objects.update(**serializer.validated_data)
+    data = serializer.validated_data
+
+    Product.objects.filter(bar_code = data['bar_code']).update(**serializer.validated_data)
 
     return Response(response_data, status=status.HTTP_200_OK)
 
@@ -64,13 +69,25 @@ def createSale(request):
 
     data = serializer.validated_data    
     print(data)
-    # sale = Sale.objects.create(
+    sale = Sale.objects.create(
+        pieces_sold = data["pieces"],
+        total = data['total'],
+        user = User.objects.first() #For now just taking the first for testing, bc token auth is not implemented yet
+    )
 
-    # )
+    products = data['products']
 
-    # for product in products:
-    #     ProductSale.objects.create(
-
-    #     )
+    for product in products:
+        #Create the instances of product sale
+        ProductSale.objects.create(
+            sale = sale,
+            product = product['product'],
+            pieces = product['pieces'],
+            subtotal = product['subtotal']
+        )
+        #Updating the stock for each of this products
+        product_inventory = ProductInventory.objects.get(product = product['product'])
+        product_inventory.stock = product_inventory.stock - product['pieces']
+        product_inventory.save()
 
     return Response(response_data, status=status.HTTP_200_OK)

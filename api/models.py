@@ -29,18 +29,18 @@ class Sale(models.Model):
     user = models.ForeignKey(User, models.DO_NOTHING)
 
     def __str__(self):
-        return f"Sale on: {self.date}"
+        return f"User: {self.user} Total: {self.total} On: {self.created_date} "
 
 class ProductSale(models.Model):
     id = models.AutoField(primary_key=True)
     created_date = models.DateTimeField(auto_now_add=True)
     sale = models.ForeignKey(Sale, models.DO_NOTHING)
     product = models.ForeignKey(Product, models.DO_NOTHING)
-    quantity = models.IntegerField()
+    pieces = models.IntegerField()
     subtotal = models.FloatField()
 
     def __str__(self):
-        return f"Product: {self.product} Quantity: {self.quantity} Subtotal: {self.subtotal}"
+        return f"Product: {self.product} Pieces: {self.pieces} Subtotal: {self.subtotal}"
 
 class ProductInventory(models.Model):
     id = models.AutoField(primary_key=True)
@@ -70,4 +70,4 @@ class InventoryUpdate(models.Model):
     user = models.ForeignKey(User, models.DO_NOTHING)
 
     def __str__(self):
-        return f"Product: {self.product} Pieces Added: {self.quantity} Date: {self.created_date}"
+        return f"Product: {self.product} Pieces Added: {self.pieces} Date: {self.created_date}"
