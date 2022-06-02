@@ -10,4 +10,6 @@ urlpatterns=[
    path('update-product/', views.updateProduct),
    #Sales
    path('create-sale/', views.createSale),
+   #Inventory
+   path('get-inventory/', views.getInventory),
 ]

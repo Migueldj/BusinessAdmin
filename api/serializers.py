@@ -1,6 +1,7 @@
 from itertools import product
 from math import prod
 from re import I
+from django.forms import CharField
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer, Serializer, ValidationError
 
@@ -64,3 +65,10 @@ class CreateSaleSerializer(Serializer):
             value['products'] = sale_products_list
 
         return value
+
+class InventorySerializer(ModelSerializer):
+    name = serializers.CharField(source="product.name")
+    description = serializers.CharField(source="product.description")
+    class Meta:
+        model = ProductInventory
+        fields = '__all__'

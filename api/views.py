@@ -7,7 +7,7 @@ import json
 
 from .models import User, Product, ProductInventory, ProductSale, Sale
 
-from .serializers import ProductSerializer, CreateSaleSerializer
+from .serializers import ProductSerializer, CreateSaleSerializer, InventorySerializer
 
 
 """
@@ -89,5 +89,25 @@ def createSale(request):
         product_inventory = ProductInventory.objects.get(product = product['product'])
         product_inventory.stock = product_inventory.stock - product['pieces']
         product_inventory.save()
+
+    return Response(response_data, status=status.HTTP_200_OK)
+
+"""
+INVENTORY
+"""
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def getInventory(request):
+    response_data = {}
+    q = Q ()
+
+    if "search" in request.data:
+        search = request.data['search']
+        q &= Q(product__name__icontains=search) | Q(product__description__icontains=search)
+    
+    inventory = ProductInventory.objects.filter(q)
+    serializer = InventorySerializer(inventory, many=True)
+
+    response_data['inventory'] = serializer.data
 
     return Response(response_data, status=status.HTTP_200_OK)
