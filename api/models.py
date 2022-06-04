@@ -1,5 +1,7 @@
+from concurrent.futures import process
 import email
 from itertools import product
+from math import prod
 from unicodedata import name
 from django.db import models
 from django.contrib.auth.models import AbstractUser
@@ -18,7 +20,7 @@ class Product(models.Model):
     bar_code = models.CharField(max_length=64)
 
     def __str__(self):
-        return f"{self.name} ${self.price} | Description: {self.description}"
+        return f" ID: {self.id} {self.name} ${self.price} | Description: {self.description}"
 
 class Sale(models.Model):
     id = models.AutoField(primary_key=True)
@@ -51,23 +53,43 @@ class ProductInventory(models.Model):
 
     def __str__(self):
         return f"Product: {self.product} Stock: {self.stock}"
-
-class UpdateType(models.Model):
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=256)
-
-    def __str__(self):
-        return self.name
-        
-class InventoryUpdate(models.Model):
+      
+class InboundInventory(models.Model):
     id = models.AutoField(primary_key=True)
     created_date = models.DateTimeField(auto_now_add=True)
     update_date = models.DateTimeField(auto_now=True)
     product = models.ForeignKey(Product, models.DO_NOTHING)
     pieces = models.IntegerField()
-    update_type = models.ForeignKey(UpdateType, models.DO_NOTHING)
-    comments = models.TextField()
+    comments = models.TextField(blank=True, null=True)
     user = models.ForeignKey(User, models.DO_NOTHING)
 
     def __str__(self):
         return f"Product: {self.product} Pieces Added: {self.pieces} Date: {self.created_date}"
+
+    def save(self, *args, **kwargs):
+        qs_product_inventory = ProductInventory.objects.filter(product = self.product)
+        
+        if qs_product_inventory.exists():
+            product_inventory = qs_product_inventory.first()
+            product_inventory.stock = product_inventory.stock + self.pieces
+            product_inventory.save()
+            
+        else:
+            ProductInventory.objects.create(
+                product = self.product,
+                stock = self.pieces
+            )
+
+        super(InboundInventory, self).save(*args, **kwargs)
+
+class OutboundInventory(models.Model):
+    id = models.AutoField(primary_key=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    update_date = models.DateTimeField(auto_now=True)
+    product = models.ForeignKey(Product, models.DO_NOTHING)
+    pieces = models.IntegerField()
+    comments = models.TextField(blank=True, null=True)
+    user = models.ForeignKey(User, models.DO_NOTHING)
+
+    def __str__(self):
+        return f"Product: {self.product} Pieces Removed: {self.pieces} Date: {self.created_date}"

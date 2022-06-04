@@ -2,6 +2,7 @@ from itertools import product
 from math import prod
 from re import I
 from django.forms import CharField
+from pkg_resources import require
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer, Serializer, ValidationError
 
@@ -72,3 +73,30 @@ class InventorySerializer(ModelSerializer):
     class Meta:
         model = ProductInventory
         fields = '__all__'
+
+class AddInventorySerializer(Serializer):
+    products = serializers.CharField()
+    pieces = serializers.CharField()
+
+    def validate(self, attrs):
+        try:
+            products_list = attrs['products'].split(',')
+            pieces_list = [int(item) for item in attrs["pieces"].split(',')]
+        except:
+            raise ValidationError("There's been an error trying to create products/pieces lists")
+
+        #Validating all products have number of pieces
+        if len(products_list) != len(pieces_list):
+            raise ValidationError("Not all pieces for all products are provided")
+        
+        inventory_products_pieces=[]
+        for idx, product_id in enumerate(products_list):
+            qs_product = Product.objects.filter(id = product_id)
+            if not qs_product.exists():
+                raise ValidationError("Product not registered in our database")
+    
+            product_id_instance = qs_product.first()
+            inventory_products_pieces.append({"product": product_id_instance, "pieces": pieces_list[idx]})
+
+        attrs["products_pieces"] = inventory_products_pieces
+        return attrs

@@ -5,9 +5,9 @@ from django.db.models import Q
 from rest_framework.permissions import AllowAny
 import json
 
-from .models import User, Product, ProductInventory, ProductSale, Sale
+from .models import InboundInventory, User, Product, ProductInventory, ProductSale, Sale
 
-from .serializers import ProductSerializer, CreateSaleSerializer, InventorySerializer
+from .serializers import ProductSerializer, CreateSaleSerializer, InventorySerializer, AddInventorySerializer
 
 
 """
@@ -109,5 +109,28 @@ def getInventory(request):
     serializer = InventorySerializer(inventory, many=True)
 
     response_data['inventory'] = serializer.data
+
+    return Response(response_data, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def addInventory(request):
+    response_data = {}
+    
+    serializer = AddInventorySerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+
+    data = serializer.validated_data
+    
+    products_pieces = data["products_pieces"]
+
+    for product in products_pieces:
+        InboundInventory.objects.create(
+            product = product["product"],
+            pieces = product["pieces"],
+            user = User.objects.first()
+        )
+
+    response_data['status'] = 1
 
     return Response(response_data, status=status.HTTP_200_OK)
