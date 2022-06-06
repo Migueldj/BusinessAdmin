@@ -1,6 +1,7 @@
 from itertools import product
 from math import prod
 from re import I
+from turtle import update
 from django.forms import CharField
 from pkg_resources import require
 from rest_framework import serializers
@@ -77,7 +78,7 @@ class InventorySerializer(ModelSerializer):
 class UpdateInventorySerializer(Serializer):
     products = serializers.CharField()
     pieces = serializers.CharField()
-    # update_type = serializers.BooleanField()
+    update_type = serializers.IntegerField() # 0 Remove 1 Add
 
     def validate(self, attrs):
         try:
@@ -85,19 +86,40 @@ class UpdateInventorySerializer(Serializer):
             pieces_list = [int(item) for item in attrs["pieces"].split(',')]
         except:
             raise ValidationError("There's been an error trying to create products/pieces lists")
-
+        
         #Validating all products have number of pieces
         if len(products_list) != len(pieces_list):
             raise ValidationError("Not all pieces for all products are provided")
         
         inventory_products_pieces=[]
-        for idx, product_id in enumerate(products_list):
-            qs_product = Product.objects.filter(id = product_id)
-            if not qs_product.exists():
-                raise ValidationError("Product not registered in our database")
-    
-            product_id_instance = qs_product.first()
-            inventory_products_pieces.append({"product": product_id_instance, "pieces": pieces_list[idx]})
+        if attrs['update_type'] == 1:
+            for idx, product_id in enumerate(products_list):
+                qs_product = Product.objects.filter(id = product_id)
+                if not qs_product.exists():
+                    raise ValidationError("Product not registered in our database")
+        
+                product_id_instance = qs_product.first()
+                inventory_products_pieces.append({"product": product_id_instance, "pieces": pieces_list[idx]})
+
+        elif attrs['update_type'] == 0:
+            for idx, product_id in enumerate(products_list):
+
+                qs_product = Product.objects.filter(id = product_id)
+                if not qs_product.exists():
+                    raise ValidationError("Product not registered in our database")
+
+                qs_inventory = ProductInventory.objects.filter(product = qs_product.first())
+                if not qs_inventory.exists():
+                    raise ValidationError("Can't remove inventory from a product without stock")
+
+                if qs_inventory.first().stock < pieces_list[idx]:
+                    raise ValidationError("Pieces to remove can't be greater than the current stock")
+        
+                product_id_instance = qs_product.first()
+                inventory_products_pieces.append({"product": product_id_instance, "pieces": pieces_list[idx]})
+        else:
+            raise ValidationError("Select a valid update type")
 
         attrs["products_pieces"] = inventory_products_pieces
+        
         return attrs

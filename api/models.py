@@ -102,4 +102,4 @@ class OutboundInventory(models.Model):
             product_inventory.stock = product_inventory.stock - self.pieces
             product_inventory.save()
             
-        super(InboundInventory, self).save(*args, **kwargs)
+        super(OutboundInventory, self).save(*args, **kwargs)

@@ -126,7 +126,7 @@ def getInventory(request):
 def addInventory(request):
     response_data = {}
     
-    serializer = AddInventorySerializer(data=request.data)
+    serializer = UpdateInventorySerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
 
     data = serializer.validated_data

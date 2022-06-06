@@ -14,4 +14,5 @@ urlpatterns=[
    #Inventory
    path('get-inventory/', views.getInventory),
    path('add-inventory/', views.addInventory),
+   path('remove-inventory/', views.removeInventory),
 ]
