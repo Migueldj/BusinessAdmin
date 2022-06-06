@@ -5,10 +5,19 @@ from django.db.models import Q
 from rest_framework.permissions import AllowAny
 import json
 
-from .models import InboundInventory, User, Product, ProductInventory, ProductSale, Sale
+from .models import InboundInventory, OutboundInventory, User, Product, ProductInventory, ProductSale, Sale
 
-from .serializers import ProductSerializer, CreateSaleSerializer, InventorySerializer, AddInventorySerializer
+from .serializers import ProductSerializer, CreateSaleSerializer, InventorySerializer, UpdateInventorySerializer
 
+"""
+TEST
+"""
+
+@api_view(['POST'])
+def test(request):
+    response_data = {}
+    print(type(request.data['bool']))
+    return Response(response_data, status=status.HTTP_200_OK)
 
 """
 PRODUCTS
@@ -126,6 +135,29 @@ def addInventory(request):
 
     for product in products_pieces:
         InboundInventory.objects.create(
+            product = product["product"],
+            pieces = product["pieces"],
+            user = User.objects.first()
+        )
+
+    response_data['status'] = 1
+
+    return Response(response_data, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def removeInventory(request):
+    response_data = {}
+    
+    serializer = UpdateInventorySerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+
+    data = serializer.validated_data
+    
+    products_pieces = data["products_pieces"]
+
+    for product in products_pieces:
+        OutboundInventory.objects.create(
             product = product["product"],
             pieces = product["pieces"],
             user = User.objects.first()

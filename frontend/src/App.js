@@ -1,19 +1,14 @@
 import logo from './logo.svg';
 import './App.css';
-import { createSale } from "./api/sales"
+import { testEP } from "./api/sales"
 
 function App() {
 
-  const CreateSale = async () => {
+  const Test = async () => {
     try {
-      // const obj = {
-      //   products: [{"name":"lol"}, {"name":"xd"}],
-      //   name: "Miguel",
-      //   age: 22
-      // }
       const data = new FormData()
-      data.append('products', JSON.stringify([{"name":"lol", "quantity":2}, {"name":"xd", "quantity":5}]))
-      const response = await createSale(data)
+      data.append('bool', true)
+      const response = await testEP(data)
     } catch (error) {
       console.log(error.response)
     }
@@ -34,7 +29,7 @@ function App() {
         >
           Learn React
         </a>
-        <button onClick={CreateSale}>LOL</button>
+        <button onClick={Test}>LOL</button>
       </header>
     </div>
   );

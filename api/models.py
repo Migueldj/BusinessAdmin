@@ -93,3 +93,13 @@ class OutboundInventory(models.Model):
 
     def __str__(self):
         return f"Product: {self.product} Pieces Removed: {self.pieces} Date: {self.created_date}"
+
+    def save(self, *args, **kwargs):
+        qs_product_inventory = ProductInventory.objects.filter(product = self.product)
+        
+        if qs_product_inventory.exists():
+            product_inventory = qs_product_inventory.first()
+            product_inventory.stock = product_inventory.stock - self.pieces
+            product_inventory.save()
+            
+        super(InboundInventory, self).save(*args, **kwargs)

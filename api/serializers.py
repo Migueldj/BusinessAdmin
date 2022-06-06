@@ -74,9 +74,10 @@ class InventorySerializer(ModelSerializer):
         model = ProductInventory
         fields = '__all__'
 
-class AddInventorySerializer(Serializer):
+class UpdateInventorySerializer(Serializer):
     products = serializers.CharField()
     pieces = serializers.CharField()
+    # update_type = serializers.BooleanField()
 
     def validate(self, attrs):
         try:
