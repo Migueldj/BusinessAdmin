@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'api'
+    'api',
+    'config'
 ]
 
 MIDDLEWARE = [
@@ -131,7 +132,7 @@ STATICFILES_DIRS = [
     BASE_DIR / 'frontend/build/static'
 ]
 
-AUTH_USER_MODEL = 'api.User'
+AUTH_USER_MODEL = 'config.User'
 
 #Removing CSRF auth for development purposes
 REST_FRAMEWORK = {

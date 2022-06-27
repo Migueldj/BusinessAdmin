@@ -5,7 +5,8 @@ from django.db.models import Q
 from rest_framework.permissions import AllowAny
 import json
 
-from .models import InboundInventory, OutboundInventory, User, Product, ProductInventory, ProductSale, Sale
+from .models import InboundInventory, OutboundInventory, Product, ProductInventory, ProductSale, Sale
+from config.models import User
 
 from .serializers import ProductSerializer, CreateSaleSerializer, InventorySerializer, UpdateInventorySerializer
 

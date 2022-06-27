@@ -1,14 +1,9 @@
-from concurrent.futures import process
-import email
-from itertools import product
-from math import prod
-from unicodedata import name
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+# from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
-class User(AbstractUser):
-    pass
+# class User(AbstractUser):
+#     pass
 
 class Product(models.Model):
     id = models.AutoField(primary_key=True)
@@ -28,7 +23,7 @@ class Sale(models.Model):
     update_date = models.DateTimeField(auto_now=True)
     pieces_sold = models.IntegerField()
     total = models.FloatField(default=0, editable=False)
-    user = models.ForeignKey(User, models.DO_NOTHING)
+    # user = models.ForeignKey(User, models.DO_NOTHING)
 
     def __str__(self):
         return f"User: {self.user} Total: {self.total} On: {self.created_date} "
@@ -61,7 +56,7 @@ class InboundInventory(models.Model):
     product = models.ForeignKey(Product, models.DO_NOTHING)
     pieces = models.IntegerField()
     comments = models.TextField(blank=True, null=True)
-    user = models.ForeignKey(User, models.DO_NOTHING)
+    # user = models.ForeignKey(User, models.DO_NOTHING)
 
     def __str__(self):
         return f"Product: {self.product} Pieces Added: {self.pieces} Date: {self.created_date}"
@@ -89,7 +84,7 @@ class OutboundInventory(models.Model):
     product = models.ForeignKey(Product, models.DO_NOTHING)
     pieces = models.IntegerField()
     comments = models.TextField(blank=True, null=True)
-    user = models.ForeignKey(User, models.DO_NOTHING)
+    # user = models.ForeignKey(User, models.DO_NOTHING)
 
     def __str__(self):
         return f"Product: {self.product} Pieces Removed: {self.pieces} Date: {self.created_date}"
