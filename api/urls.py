@@ -9,6 +9,7 @@ urlpatterns=[
    path('get-products/', views.getProducts),
    path('create-product/', views.createProduct),
    path('update-product/', views.updateProduct),
+   path('upload-products/', views.uploadProductsCSV),
    #Sales
    path('create-sale/', views.createSale),
    #Inventory

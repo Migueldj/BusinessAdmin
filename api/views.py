@@ -1,9 +1,10 @@
+from urllib import response
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from django.db.models import Q
 from rest_framework.permissions import AllowAny
-import json
+import csv
 
 from .models import InboundInventory, OutboundInventory, Product, ProductInventory, ProductSale, Sale
 from config.models import User
@@ -65,6 +66,19 @@ def updateProduct(request):
     Product.objects.filter(bar_code = data['bar_code']).update(**serializer.validated_data)
 
     return Response(response_data, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def uploadProductsCSV(request):
+
+    if not bool(request.FILES.get('products_csv')):
+        return Response({ 'error' : 'File missing' }, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        csv_file = request.FILES['products_csv']
+    except Exception as e:
+        print(e)
+        
+    return Response({}, status=status.HTTP_200_OK)
 
 
 """
