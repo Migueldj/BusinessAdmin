@@ -18,7 +18,8 @@ TEST
 @api_view(['POST'])
 def test(request):
     response_data = {}
-    print(type(request.data['bool']))
+    # print(request.data)
+    print(Product.objects.filter(name="prod 1").exists())
     return Response(response_data, status=status.HTTP_200_OK)
 
 """
@@ -36,6 +37,7 @@ def getProducts(request):
         q &= Q(name__icontains=search) | Q(description__icontains=search)
     
     products = Product.objects.filter(q)
+    print(products)
     serializer = ProductSerializer(products, many=True)
 
     response_data['products'] = serializer.data
@@ -49,7 +51,13 @@ def createProduct(request):
     context = {"request": request}
     serializer = ProductSerializer(data=request.data, context=context)
     serializer.is_valid(raise_exception=True)
-    Product.objects.create(**serializer.validated_data)
+    data = serializer.validated_data
+    print(data)
+    # Product.objects.create(**serializer.validated_data)
+    # Product.objects.create(
+    #     name = 
+    # )
+
 
     return Response(response_data, status=status.HTTP_200_OK)
 

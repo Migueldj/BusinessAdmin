@@ -1,3 +1,4 @@
+from email.policy import default
 from itertools import product
 from math import prod
 from re import I
